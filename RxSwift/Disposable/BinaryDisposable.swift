@@ -43,6 +43,10 @@ private final class BinaryDisposable : DisposeBase, Cancelable {
             _disposable2 = nil
         }
     }
+    
+    deinit {
+        print("BinaryDisposable deinit ")
+    }
 }
 
 extension Disposables {

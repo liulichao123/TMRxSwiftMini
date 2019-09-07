@@ -62,4 +62,8 @@ final fileprivate class AnonymousObservable<Element> : Producer<Element> {
         let subscription = sink.run(self)
         return (sink: sink, subscription: subscription)
     }
+    
+    deinit {
+        print("AnonymousObservable deinit")
+    }
 }

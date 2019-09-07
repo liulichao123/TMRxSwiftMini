@@ -17,11 +17,16 @@ final class AnonymousObserver<ElementType> : ObserverBase<ElementType> {
     private let _eventHandler : EventHandler
     
     init(_ eventHandler: @escaping EventHandler) {
+        print("AnonymousObserver init")
         _eventHandler = eventHandler
     }
     
     override func onCore(_ event: Event<Element>) {
         return _eventHandler(event)
+    }
+    
+    deinit {
+        print("AnonymousObserver deinit")
     }
 
 }

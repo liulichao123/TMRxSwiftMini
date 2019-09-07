@@ -20,6 +20,11 @@ class ViewController: UIViewController {
         test2()
     }
     
+    @IBAction func createBag(_ sender: Any) {
+        bag = DisposeBag()
+    }
+    
+    
     /// 测试 Observable<Int>.just(...)
     func test1() {
         let obs = Observable<Int>.just(1)
@@ -35,23 +40,25 @@ class ViewController: UIViewController {
         disposeble.dispose()
         //disposeble.disposed(by: bag)
     }
-
     
-    @IBAction func createBag(_ sender: Any) {
-        bag = DisposeBag()
-    }
     var bag = DisposeBag()
     /// 测试 Observable<Int>.create
     func test2() {
         let obs = Observable<Int>.create { (o) -> Disposable in
             o.onNext(1)
             delayTime(time: 1, block: {
-                o.onNext(2)
+                //o.onNext(2)
                 o.onCompleted()
             })
-            //o.onCompleted()
-            return Disposables.create()
+            //o.onCompleted() // 如果在return之前就执行，下面的销毁1"则不会被执行到，
+            // 因为当前观察序列在设置Disposablesz之前就completed了
+            return Disposables.create {
+                print("销毁1")
+            }
+            // return Disposables.create()
         }
+    
+        
         let disposeble = obs.subscribe(onNext: { (value) in
             print("onNext", value)
         }, onError: { (e) in
@@ -61,7 +68,14 @@ class ViewController: UIViewController {
         }, onDisposed: {
             print("onDisposed")
         })
-        disposeble.disposed(by: bag)
+
+        disposeble.dispose()
+        //        disposeble.disposed(by: bag)
+        //        bag = DisposeBag()
+        
+        
+        /**总结：disposeble一定要加入DisposeBag()管理，o.onCompleted(）也一定要在必要时调用，否者容易内部导致observer不销毁 */
+
     }
     
 }
